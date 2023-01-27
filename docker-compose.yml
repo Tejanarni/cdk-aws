@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+      - ./brainbotcms_staging:/docker-entrypoint-initdb.d/
+  # mongodb:
+  #   image: mongo:5.0.2
+  #   restart: unless-stopped
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=$MONGO_DB_USER
+  #     - MONGO_INITDB_ROOT_PASSWORD=$MONGO_DB_PASSWORD
+  #   ports:
+  #     - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+  #   volumes:
+  #     - db:/data/db
+  app:
+    depends_on:
+      - db
+    build: .
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
