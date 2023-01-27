@@ -19,3 +19,17 @@ ENV ASPNETCORE_URLS=https://+:5001;HTTPS_PORT=5001
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/cert.pem
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=
 ENTRYPOINT ["dotnet",
+
+
+
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine
+RUN apk add --no-cache openssl
+RUN openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+COPY . /app
+WORKDIR /app
+ENV ASPNETCORE_URLS=https://+:5001;HTTPS_PORT=5001
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/cert.pem
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=
+ENTRYPOINT ["dotnet", "your_application.dll"]
+
