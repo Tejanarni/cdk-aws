@@ -1,55 +1,50 @@
-import * as cdk from 'aws-cdk-lib';
-import * as ecs from 'aws-cdk-lib/aws-ecs';
-import * as efs from 'aws-cdk-lib/aws-efs';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
+from aws_cdk import (
+    core,
+    aws_ec2 as ec2,
+    aws_efs as efs,
+    aws_ecs as ecs
+)
 
-const app = new cdk.App();
-const stack = new cdk.Stack(app, 'MyStack');
+class MyStack(core.Stack):
+    
+    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
+        super().__init__(scope, id, **kwargs)
 
-// Create the EFS file system
-const fileSystem = new efs.FileSystem(stack, 'MyEfsFileSystem', {
-  vpc: new ec2.Vpc(stack, 'MyVpc'),
-  encrypted: true
-});
+        # Create the EFS file system
+        file_system = efs.FileSystem(self, 'MyEfsFileSystem',
+                                     vpc=ec2.Vpc(self, 'MyVpc'),
+                                     encrypted=True)
 
-// Define the mount point for the EFS volume
-const efsVolumeConfig = {
-  name: 'my-efs-volume',
-  efsVolumeConfiguration: {
-    fileSystemId: fileSystem.fileSystemId,
-    transitEncryption: 'ENABLED',
-    authorizationConfig: {
-      accessPointId: 'fsap-0123456789abcdef0' // Replace with your EFS access point ID
-    }
-  }
-};
+        # Define the mount point for the EFS volume
+        efs_volume_config = ecs.Volume(name='my-efs-volume',
+                                       efs_volume_configuration=ecs.EfsVolumeConfiguration(
+                                           file_system_id=file_system.file_system_id,
+                                           transit_encryption='ENABLED',
+                                           authorization_config=ecs.AuthorizationConfig(
+                                               access_point_id='fsap-0123456789abcdef0'  # Replace with your EFS access point ID
+                                           )))
 
-// Create the ECS Fargate task definition with the EFS volume mount
-const taskDefinition = new ecs.FargateTaskDefinition(stack, 'MyTaskDefinition', {
-  memoryLimitMiB: 512,
-  cpu: 256
-});
-taskDefinition.addVolume(efsVolumeConfig);
-const containerDefinition = taskDefinition.addContainer('MyContainer', {
-  image: ecs.ContainerImage.fromRegistry('nginx:latest'),
-  memoryLimitMiB: 512,
-  cpu: 256
-});
-containerDefinition.addMountPoints({
-  containerPath: '/mnt/efs',
-  sourceVolume: efsVolumeConfig.name,
-  readOnly: false
-});
+        # Create the ECS Fargate task definition with the EFS volume mount
+        task_definition = ecs.FargateTaskDefinition(self, 'MyTaskDefinition',
+                                                    memory_limit_mib=512,
+                                                    cpu=256)
+        task_definition.add_volume(efs_volume_config)
+        container_definition = task_definition.add_container('MyContainer',
+                                                              image=ecs.ContainerImage.from_registry('nginx:latest'),
+                                                              memory_limit_mib=512,
+                                                              cpu=256)
+        container_definition.add_mount_points(ecs.MountPoint(
+            container_path='/mnt/efs',
+            source_volume=efs_volume_config.name,
+            read_only=False
+        ))
 
-// Create the ECS Fargate service
-const service = new ecs.FargateService(stack, 'MyFargateService', {
-  cluster: new ecs.Cluster(stack, 'MyCluster', {
-    vpc: new ec2.Vpc(stack, 'MyVpc')
-  }),
-  taskDefinition: taskDefinition,
-  desiredCount: 1,
-  assignPublicIp: true
-});
+        # Create the ECS Fargate service
+        service = ecs.FargateService(self, 'MyFargateService',
+                                     cluster=ecs.Cluster(self, 'MyCluster', vpc=ec2.Vpc(self, 'MyVpc')),
+                                     task_definition=task_definition,
+                                     desired_count=1,
+                                     assign_public_ip=True)
 
-// Grant the ECS task IAM role access to the EFS file system
-fileSystem.connections.allowDefaultPortFrom(service.taskDefinition.taskRole);
+        # Grant the ECS task IAM role access to the EFS file system
+        file_system.connections.allow_default_port_from(service.task_definition.task_role)
