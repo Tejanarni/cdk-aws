@@ -10,18 +10,6 @@ client = boto3.client('ecs')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-##son input :  stop-instances
-#{
-# "action": "start",
-# "dbInstance": "rds-tmt"
-#}
-#Json input :  stop-instances
-#{
-#  "action": "stop",
-#  "dbInstance": "rds-tmt"
-#}
-##
-
 def lambda_handler(event, context):
     logger.info("Event: " + str(event))
 
@@ -35,41 +23,35 @@ def lambda_handler(event, context):
         stop_rds_instances(dbInstance)         
     elif (action == 'start'):
         start_rds_instances(dbInstance)
-    elif (ecs == 'true'):
-        update_ecs_tasks(ecstasks)
+    elif (action == 'update_ecs'):
+        update_ecs_tasks(cluster, service_names, service_desired_count)
 
     return {
         'statusCode': 200,
         'body': json.dumps("Script execution completed. See Cloudwatch logs for complete output")
     }   
 
-### stop rds and ecs instances
+### stop rds instances
 def stop_rds_instances(dbInstance):
     try:
-        #rds.stop_db_instance(DBInstanceIdentifier=dbInstance)
-        rds.stop_db_cluster(DBClusterIdentifier=dbInstance)
+        rds.stop_db_instance(DBInstanceIdentifier=dbInstance)
         logger.info('Success :: stop_db_instance ' + dbInstance) 
 
     except ClientError as e:
         logger.error(e)   
     return "stopped:OK"
 
-
-## start rds and ecs instances
-
+### start rds instances
 def start_rds_instances(dbInstance):
     try:
-        #rds.start_db_instance(DBInstanceIdentifier=dbInstance)
-        rds.start_db_cluster(DBClusterIdentifier=dbInstance)
+        rds.start_db_instance(DBInstanceIdentifier=dbInstance)
         logger.info('Success :: start_db_instance ' + dbInstance) 
     except ClientError as e:
         logger.error(e)   
     return "started:OK"
 
-
-## start rds and ecs instances
-
-def update_ecs_tasks(ecstasks):
+### update ecs tasks
+def update_ecs_tasks(cluster, service_names, service_desired_count):
     for service_name in service_names.split(","):
         try:
             response = client.update_service(
@@ -77,7 +59,7 @@ def update_ecs_tasks(ecstasks):
                 service=service_name,
                 desiredCount=service_desired_count
             )
-            logger.info("Updated {0} service in {1} cluster with desire count set to {2} tasks".format(service_name, cluster, service_desired_count))
+            logger.info("Updated {0} service in {1} cluster with desired count set to {2} tasks".format(service_name, cluster, service_desired_count))
         except Exception as e:
             logger.error("Error updating {0} service in {1} cluster: {2}".format(service_name, cluster, e))
     return {
