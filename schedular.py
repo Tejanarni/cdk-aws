@@ -27,11 +27,16 @@ def lambda_handler(event, context):
 	logger.info("Event: " + str(event))
 
 	dbInstance = event.get('dbInstance')
+	cluster = event.get('cluster')
+    service_names = event.get('service_names')
+    service_desired_count = event.get('service_desired_count')
 	action = event.get('action')
 	if ('stop' == action):
 		stop_rds_instances(dbInstance)  	 
 	elif (action == 'start'):
 		start_rds_instances(dbInstance)
+	elif (ecs == 'true'):
+		update_ecs_tasks(ecstasks)
 
 	return {
     	'statusCode': 200,
@@ -62,24 +67,12 @@ def start_rds_instances(dbInstance):
 	return "started:OK"
 
 
+## start rds and ecs instances
 
-
-
-###############
-
-# import json
-# import boto3
-# import logging
-
-# logger = logging.getLogger()
-# logger.setLevel(logging.INFO)
-
-#client = boto3.client('ecs')
-
-def lambda2_handler(event, context):
-    cluster = event["cluster"]
-    service_names = event["service_names"]
-    service_desired_count = int(event["service_desired_count"])
+def update_ecs_tasks(ecstasks):
+    # cluster = event["cluster"]
+    # service_names = event["service_names"]
+    # service_desired_count = int(event["service_desired_count"])
 
     for service_name in service_names.split(","):
         response = client.update_service(
