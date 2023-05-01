@@ -34,7 +34,8 @@ def lambda_handler(event, context):
 ### stop rds instances
 def stop_rds_instances(dbInstance):
     try:
-        rds.stop_db_instance(DBInstanceIdentifier=dbInstance)
+        #rds.stop_db_instance(DBInstanceIdentifier=dbInstance)
+        rds.stop_db_cluster(DBClusterIdentifier=dbInstance)
         logger.info('Success :: stop_db_instance ' + dbInstance) 
 
     except ClientError as e:
@@ -44,7 +45,8 @@ def stop_rds_instances(dbInstance):
 ### start rds instances
 def start_rds_instances(dbInstance):
     try:
-        rds.start_db_instance(DBInstanceIdentifier=dbInstance)
+        #rds.start_db_instance(DBInstanceIdentifier=dbInstance)
+        rds.start_db_cluster(DBClusterIdentifier=dbInstance)
         logger.info('Success :: start_db_instance ' + dbInstance) 
     except ClientError as e:
         logger.error(e)   
