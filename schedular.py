@@ -11,13 +11,12 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-####### extract all event parameters ############
+### extract all event parameters 
 
 def lambda_handler(event, context):
-	#service_desired_count = int(event["service_desired_count"])
     logger.info("Event: " + str(event))
 
-    dbInstance = event.get('dbInstance')
+    dbclusteridentifier = event.get('dbclusteridentifier')
     cluster = event.get('cluster')
     service_names = event.get('service_names')
     service_desired_count = int(event["service_desired_count"])
@@ -25,9 +24,9 @@ def lambda_handler(event, context):
     action = event.get('action')
     
     if ('stop' == action):
-        stop_rds_instances(dbInstance)         
+        stop_rds_instances(dbclusteridentifier)         
     elif (action == 'start'):
-        start_rds_instances(dbInstance)
+        start_rds_instances(dbclusteridentifier)
     elif (action == 'update_ecs'):
         update_ecs_tasks(cluster, service_names, service_desired_count)
 
@@ -37,22 +36,22 @@ def lambda_handler(event, context):
     }   
 
 ### stop rds instances
-def stop_rds_instances(dbInstance):
+def stop_rds_instances(dbclusteridentifier):
     try:
-        #rds.stop_db_instance(DBInstanceIdentifier=dbInstance)
-        rds.stop_db_cluster(DBClusterIdentifier=dbInstance)
-        logger.info('Success :: stop_db_instance ' + dbInstance) 
+        #rds.stop_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
+        rds.stop_db_cluster(DBClusterIdentifier=dbclusteridentifier)
+        logger.info('Success :: stop_db_instance ' + dbclusteridentifier) 
 
     except ClientError as e:
         logger.error(e)   
     return "stopped:OK"
 
 ### start rds instances
-def start_rds_instances(dbInstance):
+def start_rds_instances(dbclusteridentifier):
     try:
-        #rds.start_db_instance(DBInstanceIdentifier=dbInstance)
-        rds.start_db_cluster(DBClusterIdentifier=dbInstance)
-        logger.info('Success :: start_db_instance ' + dbInstance) 
+        #rds.start_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
+        rds.start_db_cluster(DBClusterIdentifier=dbclusteridentifier)
+        logger.info('Success :: start_db_instance ' + dbclusteridentifier) 
     except ClientError as e:
         logger.error(e)   
     return "started:OK"
