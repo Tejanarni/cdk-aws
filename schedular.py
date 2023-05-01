@@ -70,19 +70,16 @@ def start_rds_instances(dbInstance):
 ## start rds and ecs instances
 
 def update_ecs_tasks(ecstasks):
-    # cluster = event["cluster"]
-    # service_names = event["service_names"]
-    # service_desired_count = int(event["service_desired_count"])
-
     for service_name in service_names.split(","):
-        response = client.update_service(
-            cluster=cluster,
-            service=service_name,
-            desiredCount=service_desired_count
-        )
-
-        logger.info("Updated {0} service in {1} cluster with desire count set to {2} tasks".format(service_name, cluster, service_desired_count))
-
+        try:
+            response = client.update_service(
+                cluster=cluster,
+                service=service_name,
+                desiredCount=service_desired_count
+            )
+            logger.info("Updated {0} service in {1} cluster with desire count set to {2} tasks".format(service_name, cluster, service_desired_count))
+        except Exception as e:
+            logger.error("Error updating {0} service in {1} cluster: {2}".format(service_name, cluster, e))
     return {
         'statusCode': 200,
         'new_desired_count': service_desired_count
