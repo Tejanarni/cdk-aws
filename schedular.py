@@ -16,38 +16,25 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
     logger.info("Event: " + str(event))
 
-    dbclusteridentifier = event.get('dbclusteridentifier')
-    cluster = event.get('cluster')
-    service_names = event.get('service_names')
-    service_desired_count = int(event["service_desired_count"])
-    #service_desired_count = event.get('service_desired_count')
+    dbclusteridentifier = event['rds']['clusteridentifier']
+    cluster = event['ecs']['cluster']
+    service_names = event['ecs']['service_names']
+    service_desired_count = int(event['ecs']['service_desired_count'])
     action = event.get('action')
     
-    if ('stop' == action):
-        stop_rds_instances(dbclusteridentifier)
-        stop_ecs_tasks(cluster, service_names, service_desired_count)
-    elif (action == 'start'):
+    if ('start' == action):
         start_rds_instances(dbclusteridentifier)
         start_ecs_tasks(cluster, service_names, service_desired_count)
-    #elif (action == 'update_ecs'):
-        #update_ecs_tasks(cluster, service_names, service_desired_count)
+    
+    elif (action == 'stop'):
+        stop_rds_instances(dbclusteridentifier)
+        stop_ecs_tasks(cluster, service_names, service_desired_count)
+
 
     return {
         'statusCode': 200,
         'body': json.dumps("Script execution completed. See Cloudwatch logs for complete output")
     }   
-
-### stop rds instances
-def stop_rds_instances(dbclusteridentifier):
-    try:
-        #rds.stop_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
-        rds.stop_db_cluster(DBClusterIdentifier=dbclusteridentifier)
-        logger.info('Success :: stop_db_instance ' + dbclusteridentifier) 
-
-    except ClientError as e:
-        logger.error(e)   
-    return "stopped:OK"
-
 ### start rds instances
 def start_rds_instances(dbclusteridentifier):
     try:
@@ -57,8 +44,9 @@ def start_rds_instances(dbclusteridentifier):
     except ClientError as e:
         logger.error(e)   
     return "started:OK"
-### stop ecs tasks
-def stop_ecs_tasks(cluster, service_names, service_desired_count):
+
+### start ecs tasks
+def start_ecs_tasks(cluster, service_names, service_desired_count):
     for service_name in service_names.split(","):
         try:
             response = client.update_service(
@@ -73,11 +61,21 @@ def stop_ecs_tasks(cluster, service_names, service_desired_count):
         'statusCode': 200,
         'new_desired_count': service_desired_count
     }
-    
-    
-    
-### start ecs tasks
-def start_ecs_tasks(cluster, service_names, service_desired_count):
+
+### stop rds instances
+def stop_rds_instances(dbclusteridentifier):
+    try:
+        #rds.stop_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
+        rds.stop_db_cluster(DBClusterIdentifier=dbclusteridentifier)
+        logger.info('Success :: stop_db_instance ' + dbclusteridentifier) 
+
+    except ClientError as e:
+        logger.error(e)   
+    return "stopped:OK"
+
+
+### stop ecs tasks
+def stop_ecs_tasks(cluster, service_names, service_desired_count):
     for service_name in service_names.split(","):
         try:
             response = client.update_service(
