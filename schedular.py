@@ -24,11 +24,13 @@ def lambda_handler(event, context):
     action = event.get('action')
     
     if ('stop' == action):
-        stop_rds_instances(dbclusteridentifier)         
+        stop_rds_instances(dbclusteridentifier)
+        stop_ecs_tasks(cluster, service_names, service_desired_count)
     elif (action == 'start'):
         start_rds_instances(dbclusteridentifier)
-    elif (action == 'update_ecs'):
-        update_ecs_tasks(cluster, service_names, service_desired_count)
+        start_ecs_tasks(cluster, service_names, service_desired_count)
+    #elif (action == 'update_ecs'):
+        #update_ecs_tasks(cluster, service_names, service_desired_count)
 
     return {
         'statusCode': 200,
@@ -55,8 +57,27 @@ def start_rds_instances(dbclusteridentifier):
     except ClientError as e:
         logger.error(e)   
     return "started:OK"
-### update ecs tasks
-def update_ecs_tasks(cluster, service_names, service_desired_count):
+### stop ecs tasks
+def stop_ecs_tasks(cluster, service_names, service_desired_count):
+    for service_name in service_names.split(","):
+        try:
+            response = client.update_service(
+                cluster=cluster,
+                service=service_name,
+                desiredCount=service_desired_count
+            )
+            logger.info("Updated {0} service in {1} cluster with desired count set to {2} tasks".format(service_name, cluster, service_desired_count))
+        except Exception as e:
+            logger.error("Error updating {0} service in {1} cluster: {2}".format(service_name, cluster, e))
+    return {
+        'statusCode': 200,
+        'new_desired_count': service_desired_count
+    }
+    
+    
+    
+### start ecs tasks
+def start_ecs_tasks(cluster, service_names, service_desired_count):
     for service_name in service_names.split(","):
         try:
             response = client.update_service(
