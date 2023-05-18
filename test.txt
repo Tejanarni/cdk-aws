@@ -1,10 +1,21 @@
-      - name: Get AWS Secret
-        id: secret
-        run: |
-          secretJson=$(aws secretsmanager get-secret-value --secret-id <secret-name> --query SecretString --output text)
-          password=$(echo $secretJson | jq -r '.password')
-          echo $password > secret.txt
+class MyStack(core.Stack):
 
-      - name: Print Password
-        run: |
-          cat secret.txt
+    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
+        super().__init__(scope, id, **kwargs)
+
+        # Provide the ARN of your existing Load Balancer
+        load_balancer_arn = "<your-load-balancer-arn>"
+
+        # Create an API Gateway HTTP API
+        http_api = apigw.HttpApi(self, "MyHttpApi")
+
+        # Configure the Load Balancer as the integration target for the API Gateway
+        http_api.add_routes(
+            path="/{proxy+}",
+            methods=[apigw.HttpMethod.ANY],
+            integration=apigw.HttpIntegration(
+                type=apigw.HttpIntegrationType.HTTP_PROXY,
+                uri=f"arn:aws:apigateway:{core.Aws.REGION}:elasticloadbalancing:{core.Aws.ACCOUNT_ID}:targetgroup/{load_balancer_arn}/*",
+                integration_method=apigw.HttpIntegrationMethod.ANY
+            )
+        )
