@@ -10,9 +10,8 @@ proxy_resource = rest_api.root.add_resource("{proxy+}")
 proxy_resource.add_method(
     "ANY",
     apigw.HttpIntegration(
-        type=apigw.HttpIntegrationType.HTTP_PROXY,
-        integration_uri=f"arn:aws:apigateway:{core.Aws.REGION}:elasticloadbalancing:{core.Aws.ACCOUNT_ID}:targetgroup/{load_balancer_arn}/*",
+        type=apigw.HttpIntegrationType.PROXY,
+        uri=f"arn:aws:apigateway:{core.Aws.REGION}:elasticloadbalancing:{core.Aws.ACCOUNT_ID}:targetgroup/{load_balancer_arn}/*",
         integration_http_method="ANY"
     )
 )
-
