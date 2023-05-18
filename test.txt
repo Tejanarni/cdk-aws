@@ -1,24 +1,18 @@
-from aws_cdk import core
-from aws_cdk import aws_apigateway as apigw
-from aws_cdk import aws_elasticloadbalancingv2 as elbv2
+# Existing Load Balancer ARN
+load_balancer_arn = lb.load_balancer_arn
+aws_account = pipeline_config.get('ecr_config').get('account_id')
 
-class MyStack(core.Stack):
-    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
-        super().__init__(scope, id, **kwargs)
+# Create an API Gateway RestApi
+rest_api = apigw.RestApi(self, "MyRestApi")
 
-        # Existing Load Balancer ARN
-        load_balancer_arn = "<existing-load-balancer-arn>"
+# Create a resource and method to proxy requests to the Load Balancer
+proxy_resource = rest_api.root.add_resource("{proxy+}")
+proxy_resource.add_method(
+    "ANY",
+    apigw.HttpIntegration(
+        type=apigw.HttpIntegrationType.HTTP_PROXY,
+        integration_uri=f"arn:aws:apigateway:{core.Aws.REGION}:elasticloadbalancing:{core.Aws.ACCOUNT_ID}:targetgroup/{load_balancer_arn}/*",
+        integration_http_method="ANY"
+    )
+)
 
-        # Create an API Gateway RestApi
-        rest_api = apigw.RestApi(self, "MyRestApi")
-
-        # Create a resource and method to proxy requests to the Load Balancer
-        proxy_resource = rest_api.root.add_resource("{proxy+}")
-        proxy_resource.add_method(
-            "ANY",
-            apigw.HttpIntegration(
-                type=apigw.HttpIntegrationType.HTTP_PROXY,
-                uri=f"arn:aws:elasticloadbalancing:{core.Aws.REGION}:{core.Aws.ACCOUNT_ID}:targetgroup/{load_balancer_arn}/*",
-                integration_http_method="ANY"
-            )
-        )
