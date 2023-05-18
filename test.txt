@@ -1,0 +1,10 @@
+      - name: Get AWS Secret
+        id: secret
+        run: |
+          secretJson=$(aws secretsmanager get-secret-value --secret-id <secret-name> --query SecretString --output text)
+          password=$(echo $secretJson | jq -r '.password')
+          echo $password > secret.txt
+
+      - name: Print Password
+        run: |
+          cat secret.txt
