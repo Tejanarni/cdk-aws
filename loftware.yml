@@ -1,0 +1,351 @@
+# 
+# SIGNET SECURITY GROUP DEPLOYMENT
+#
+# How to use: <add instructions>
+# 
+#
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+  AWS::CloudFormation::Interface: 
+    ParameterGroups:
+      -
+        Label: 
+          default: "VPC Selection"
+        Parameters: 
+          - pVpc
+      -
+        Label: 
+          default: "Security Group Naming"
+        Parameters: 
+          - SGname
+          - SGdesc
+      -
+        Label: 
+          default: "Ingress Rule 1 [REQUIRED]"
+        Parameters: 
+          - pIngressRule1IpProtocol
+          - pIngressRule1Port
+          - pIngressRule1Cidr
+      -
+        Label: 
+          default: "Ingress Rule 2"
+        Parameters: 
+          - pIngressRule2IpProtocol
+          - pIngressRule2Port
+          - pIngressRule2Cidr
+      -
+        Label: 
+          default: "Ingress Rule 3"
+        Parameters: 
+          - pIngressRule3IpProtocol
+          - pIngressRule3Port
+          - pIngressRule3Cidr
+      -
+        Label: 
+          default: "Ingress Rule 4"
+        Parameters: 
+          - pIngressRule4IpProtocol
+          - pIngressRule4Port
+          - pIngressRule4Cidr
+      -
+        Label: 
+          default: "Ingress Rule 5"
+        Parameters: 
+          - pIngressRule5IpProtocol
+          - pIngressRule5Port
+          - pIngressRule5Cidr
+      -
+        Label: 
+          default: "Egress Rule 1 [REQUIRED]"
+        Parameters: 
+          - pEgressRule1IpProtocol
+          - pEgressRule1Port
+          - pEgressRule1Cidr
+      -
+        Label: 
+          default: "Egress Rule 2"
+        Parameters: 
+          - pEgressRule2IpProtocol
+          - pEgressRule2Port
+          - pEgressRule2Cidr
+      -
+        Label: 
+          default: "Egress Rule 3"
+        Parameters: 
+          - pEgressRule3IpProtocol
+          - pEgressRule3Port
+          - pEgressRule3Cidr
+      -
+        Label: 
+          default: "Egress Rule 4"
+        Parameters: 
+          - pEgressRule4IpProtocol
+          - pEgressRule4Port
+          - pEgressRule4Cidr
+      -
+        Label: 
+          default: "Egress Rule 5"
+        Parameters: 
+          - pEgressRule5IpProtocol
+          - pEgressRule5Port
+          - pEgressRule5Cidr
+    ParameterLabels: 
+        pVpc: 
+          default: "Select the ID of the VPC:"
+        pIngressRule1IpProtocol:
+          default: "Protocol"
+        pIngressRule1Port:
+          default: "Port"
+        pIngressRule1Cidr:
+          default: "CIDR"
+        pIngressRule2IpProtocol:
+          default: "Protocol"
+        pIngressRule2Port:
+          default: "Port"
+        pIngressRule2Cidr:
+          default: "CIDR"
+        pIngressRule3IpProtocol:
+          default: "Protocol"
+        pIngressRule3Port:
+          default: "Port"
+        pIngressRule3Cidr:
+          default: "CIDR"
+        pIngressRule4IpProtocol:
+          default: "Protocol"
+        pIngressRule4Port:
+          default: "Port"
+        pIngressRule4Cidr:
+          default: "CIDR"
+        pIngressRule5IpProtocol:
+          default: "Protocol"
+        pIngressRule5Port:
+          default: "Port"
+        pIngressRule5Cidr:
+          default: "CIDR"
+        pEgressRule1IpProtocol:
+          default: "Protocol"
+        pEgressRule1Port:
+          default: "Port"
+        pEgressRule1Cidr:
+          default: "CIDR"
+        pEgressRule2IpProtocol:
+          default: "Protocol"
+        pEgressRule2Port:
+          default: "Port"
+        pEgressRule2Cidr:
+          default: "CIDR"
+        pEgressRule3IpProtocol:
+          default: "Protocol"
+        pEgressRule3Port:
+          default: "Port"
+        pEgressRule3Cidr:
+          default: "CIDR"
+        pEgressRule4IpProtocol:
+          default: "Protocol"
+        pEgressRule4Port:
+          default: "Port"
+        pEgressRule4Cidr:
+          default: "CIDR"
+        pEgressRule5IpProtocol:
+          default: "Protocol"
+        pEgressRule5Port:
+          default: "Port"
+        pEgressRule5Cidr:
+          default: "CIDR"
+        SGname:
+          default: "Name of the Security Group"
+        SGdesc:
+          default: "Describe the Security Group"
+Parameters:
+# Select the VPC ID
+  pVpc:
+    Type: AWS::EC2::VPC::Id
+  SGname:
+    Type: String
+  SGdesc:
+    Type: String
+####
+## INGRESS RULE PARAMETERS
+####
+# Rule 1 Ingress Parameters
+  pIngressRule1IpProtocol:
+    Type: String
+  pIngressRule1Port:
+    Type: String
+  pIngressRule1Cidr:
+    Type: String
+# Rule 2 Ingress Parameters
+  pIngressRule2IpProtocol:
+    Type: String
+  pIngressRule2Port:
+    Type: String
+  pIngressRule2Cidr:
+    Type: String
+# Rule 3 Ingress Parameters
+  pIngressRule3IpProtocol:
+    Type: String
+  pIngressRule3Port:
+    Type: String
+  pIngressRule3Cidr:
+    Type: String
+# Rule 4 Ingress Parameters
+  pIngressRule4IpProtocol:
+    Type: String
+  pIngressRule4Port:
+    Type: String
+  pIngressRule4Cidr:
+    Type: String
+# Rule 5 Ingress Parameters
+  pIngressRule5IpProtocol:
+    Type: String
+  pIngressRule5Port:
+    Type: String
+  pIngressRule5Cidr:
+    Type: String
+####
+## EGRESS RULES
+####
+# Rule 1 Egress Parameters
+  pEgressRule1IpProtocol:
+    Type: String
+  pEgressRule1Port:
+    Type: String
+  pEgressRule1Cidr:
+    Type: String
+# Rule 2 Egress Parameters
+  pEgressRule2IpProtocol:
+    Type: String
+  pEgressRule2Port:
+    Type: String
+  pEgressRule2Cidr:
+    Type: String
+# Rule 3 Egress Parameters
+  pEgressRule3IpProtocol:
+    Type: String
+  pEgressRule3Port:
+    Type: String
+  pEgressRule3Cidr:
+    Type: String
+# Rule 4 Egress Parameters
+  pEgressRule4IpProtocol:
+    Type: String
+  pEgressRule4Port:
+    Type: String
+  pEgressRule4Cidr:
+    Type: String
+# Rule 5 Egress Parameters
+  pEgressRule5IpProtocol:
+    Type: String
+  pEgressRule5Port:
+    Type: String
+  pEgressRule5Cidr:
+    Type: String
+Conditions:
+  CreateRule2: !Not [!Equals [!Ref pIngressRule2IpProtocol, ""]]
+  CreateRule3: !Not [!Equals [!Ref pIngressRule3IpProtocol, ""]]
+  CreateRule4: !Not [!Equals [!Ref pIngressRule4IpProtocol, ""]]
+  CreateRule5: !Not [!Equals [!Ref pIngressRule5IpProtocol, ""]]
+  CreateEgressRule2: !Not [!Equals [!Ref pEgressRule2IpProtocol, ""]]
+  CreateEgressRule3: !Not [!Equals [!Ref pEgressRule3IpProtocol, ""]]
+  CreateEgressRule4: !Not [!Equals [!Ref pEgressRule4IpProtocol, ""]]
+  CreateEgressRule5: !Not [!Equals [!Ref pEgressRule5IpProtocol, ""]]
+Resources:
+# Security Group Creation
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Ref SGdesc
+      VpcId: !Ref pVpc
+      Tags:
+        - Key: Name
+          Value: !Ref SGname
+# Ingress Rules
+  SecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties: 
+      IpProtocol: !Ref pIngressRule1IpProtocol
+      FromPort: !Ref pIngressRule1Port
+      ToPort: !Ref pIngressRule1Port
+      CidrIp: !Ref pIngressRule1Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateRule2
+    Properties:
+      IpProtocol: !Ref pIngressRule2IpProtocol
+      FromPort: !Ref pIngressRule2Port
+      ToPort: !Ref pIngressRule2Port
+      CidrIp: !Ref pIngressRule2Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupIngress3:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateRule3
+    Properties:
+      IpProtocol: !Ref pIngressRule3IpProtocol
+      FromPort: !Ref pIngressRule3Port
+      ToPort: !Ref pIngressRule3Port
+      CidrIp: !Ref pIngressRule3Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupIngress4:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateRule4
+    Properties:
+      IpProtocol: !Ref pIngressRule4IpProtocol
+      FromPort: !Ref pIngressRule4Port
+      ToPort: !Ref pIngressRule4Port
+      CidrIp: !Ref pIngressRule4Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupIngress5:
+    Type: AWS::EC2::SecurityGroupIngress
+    Condition: CreateRule5
+    Properties:
+      IpProtocol: !Ref pIngressRule5IpProtocol
+      FromPort: !Ref pIngressRule5Port
+      ToPort: !Ref pIngressRule5Port
+      CidrIp: !Ref pIngressRule5Cidr
+      GroupId: !Ref SecurityGroup
+# Egress Rules
+  SecurityGroupEgress1:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: !Ref pEgressRule1IpProtocol
+      FromPort: !Ref pEgressRule1Port
+      ToPort: !Ref pEgressRule1Port
+      CidrIp: !Ref pEgressRule1Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupEgress2:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateEgressRule2
+    Properties:
+      IpProtocol: !Ref pEgressRule2IpProtocol
+      FromPort: !Ref pEgressRule2Port
+      ToPort: !Ref pEgressRule2Port
+      CidrIp: !Ref pEgressRule2Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupEgress3:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateEgressRule3
+    Properties:
+      IpProtocol: !Ref pEgressRule3IpProtocol
+      FromPort: !Ref pEgressRule3Port
+      ToPort: !Ref pEgressRule3Port
+      CidrIp: !Ref pEgressRule3Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupEgress4:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateEgressRule4
+    Properties:
+      IpProtocol: !Ref pEgressRule4IpProtocol
+      FromPort: !Ref pEgressRule4Port
+      ToPort: !Ref pEgressRule4Port
+      CidrIp: !Ref pEgressRule4Cidr
+      GroupId: !Ref SecurityGroup
+  SecurityGroupEgress5:
+    Type: AWS::EC2::SecurityGroupEgress
+    Condition: CreateEgressRule5
+    Properties:
+      IpProtocol: !Ref pEgressRule5IpProtocol
+      FromPort: !Ref pEgressRule5Port
+      ToPort: !Ref pEgressRule5Port
+      CidrIp: !Ref pEgressRule5Cidr
+      GroupId: !Ref SecurityGroup
