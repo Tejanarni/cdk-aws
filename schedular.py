@@ -41,55 +41,79 @@ def lambda_handler(event, context):
 ### start rds instances
 def start_rds_instances(dbclusteridentifier):
     try:
-        #rds.start_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
         rds.start_db_cluster(DBClusterIdentifier=dbclusteridentifier)
         logger.info('Success :: start_db_instance ' + dbclusteridentifier) 
+        return {
+            'statusCode': 200,
+            'body': json.dumps("started:OK")
+        }
     except ClientError as e:
-        logger.error(e)   
-    return "started:OK"
+        logger.error(e)
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Error starting RDS instances: " + str(e))
+        }
 
 ### start ecs tasks
 def start_ecs_tasks(cluster, service_names, service_desired_count):
-    for service_name in service_names.split(","):
-        try:
+    try:
+        for service_name in service_names.split(","):
             response = client.update_service(
                 cluster=cluster,
                 service=service_name,
                 desiredCount=service_desired_count
             )
             logger.info("Updated {0} service in {1} cluster with desired count set to {2} tasks".format(service_name, cluster, service_desired_count))
-        except Exception as e:
-            logger.error("Error updating {0} service in {1} cluster: {2}".format(service_name, cluster, e))
-    return {
-        'statusCode': 200,
-        'new_desired_count': service_desired_count
-    }
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'message': "Successfully updated ECS tasks",
+                'new_desired_count': service_desired_count
+            })
+        }
+    except Exception as e:
+        logger.error("Error updating ECS tasks: {0}".format(str(e)))
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Error updating ECS tasks: " + str(e))
+        }
 
 ### stop rds instances
 def stop_rds_instances(dbclusteridentifier):
     try:
-        #rds.stop_db_instance(dbclusteridentifierIdentifier=dbclusteridentifier)
         rds.stop_db_cluster(DBClusterIdentifier=dbclusteridentifier)
-        logger.info('Success :: stop_db_instance ' + dbclusteridentifier) 
-
+        logger.info('Success :: stop_db_instance ' + dbclusteridentifier)
+        return {
+            'statusCode': 200,
+            'body': json.dumps("stopped:OK")
+        }
     except ClientError as e:
-        logger.error(e)   
-    return "stopped:OK"
-
+        logger.error(e)
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Error stopping RDS instances: " + str(e))
+        }
 
 ### stop ecs tasks
 def stop_ecs_tasks(cluster, service_names, service_desired_count):
-    for service_name in service_names.split(","):
-        try:
+    try:
+        for service_name in service_names.split(","):
             response = client.update_service(
                 cluster=cluster,
                 service=service_name,
                 desiredCount=service_desired_count
             )
             logger.info("Updated {0} service in {1} cluster with desired count set to {2} tasks".format(service_name, cluster, service_desired_count))
-        except Exception as e:
-            logger.error("Error updating {0} service in {1} cluster: {2}".format(service_name, cluster, e))
-    return {
-        'statusCode': 200,
-        'new_desired_count': service_desired_count
-    }
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'message': "Successfully updated ECS tasks",
+                'new_desired_count': service_desired_count
+            })
+        }
+    except Exception as e:
+        logger.error("Error updating ECS tasks: {0}".format(str(e)))
+        return {
+            'statusCode': 500,
+            'body': json.dumps("Error updating ECS tasks: " + str(e))
+        }
