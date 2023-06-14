@@ -17,6 +17,8 @@ existing_secret = secretsmanager.Secret.from_secret_name_v2(
     secret_name=aurora_cluster_secret_name
 )
 
+aurora_cluster_secret = None  # Define the variable outside the conditional block
+
 if not existing_secret:
     # Create the secret if it doesn't exist
     aurora_cluster_secret = secretsmanager.Secret(
@@ -32,11 +34,13 @@ if not existing_secret:
         )
     )
 
-    aurora_cluster_credentials = rds.Credentials.from_secret(
-        aurora_cluster_secret,
-        aurora_cluster_username
-    )
-    self.aurora_cluster_credentials_secret_arn = aurora_cluster_secret.secret_full_arn
+aurora_cluster_credentials = rds.Credentials.from_secret(
+    aurora_cluster_secret or existing_secret,  # Use the existing secret if it exists, otherwise use the newly created secret
+    aurora_cluster_username
+)
+self.aurora_cluster_credentials_secret_arn = (
+    aurora_cluster_secret.secret_full_arn if aurora_cluster_secret else existing_secret.secret_full_arn
+)
 
 # ...
 
