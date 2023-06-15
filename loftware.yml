@@ -1,107 +1,119 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Metadata:
-  AWS::CloudFormation::Interface: 
-    ParameterGroups:
-      -
-        Label: 
-          default: "VPC Selection"
-        Parameters: 
-          - pVpc
-      -
-        Label: 
-          default: "Security Group Naming"
-        Parameters: 
-          - SGname
-          - SGdesc
-      -
-        Label: 
-          default: "Ingress Rule 1 [REQUIRED]"
-        Parameters: 
-          - pIngressRule1IpProtocol
-          - pIngressRule1Port
-          - pIngressRule1Cidr
-      -
-        Label: 
-          default: "Ingress Rule 2"
-        Parameters: 
-          - pIngressRule2IpProtocol
-          - pIngressRule2Port
-          - pIngressRule2Cidr
-      -
-        Label: 
-          default: "Ingress Rule 3"
-        Parameters: 
-          - pIngressRule3IpProtocol
-          - pIngressRule3Port
-          - pIngressRule3Cidr
-      -
-        Label: 
-          default: "Ingress Rule 4"
-        Parameters: 
-          - pIngressRule4IpProtocol
-          - pIngressRule4Port
-          - pIngressRule4Cidr
-      -
-        Label: 
-          default: "Ingress Rule 5"
-        Parameters: 
-          - pIngressRule5IpProtocol
-          - pIngressRule5Port
-          - pIngressRule5Cidr
-      -
-        Label: 
-          default: "Egress Rule 1 [REQUIRED]"
-        Parameters: 
-          - pEgressRule1IpProtocol
-          - pEgressRule1Port
-          - pEgressRule1Cidr
-      -
-        Label: 
-          default: "Egress Rule 2"
-        Parameters: 
-          - pEgressRule2IpProtocol
-          - pEgressRule2Port
-          - pEgressRule2Cidr
-      -
-        Label: 
-          default: "Egress Rule 3"
-        Parameters: 
-          - pEgressRule3IpProtocol
-          - pEgressRule3Port
-          - pEgressRule3Cidr
-      -
-        Label: 
-          default: "Egress Rule 4"
-        Parameters: 
-          - pEgressRule4IpProtocol
-          - pEgressRule4Port
-          - pEgressRule4Cidr
-      -
-        Label: 
-          default: "Egress Rule 5"
-        Parameters: 
-          - pEgressRule5IpProtocol
-          - pEgressRule5Port
-          - pEgressRule5Cidr
-    ParameterLabels: 
-      pVpc: 
-        default: "Select the ID of the VPC:"
-      pIngressRule1IpProtocol:
-        default: "Protocol"
-      pIngressRule1Port:
-        default: "Port"
-      pIngressRule1Cidr:
-        default: "CIDR"
-      pIngressRule2IpProtocol:
-        default: "Protocol"
-      pIngressRule2Port:
-        default: "Port"
-      pIngressRule2Cidr:
-        default: "CIDR"
-      pIngressRule3IpProtocol:
-        default: "Protocol"
-      pIngressRule3Port:
-        default: "Port"
-      pIngressRule3Cidr:
-        default: "CIDR"
-     
+Parameters:
+  VpcId:
+    Type: String
+    Description: "ID of the VPC where the security group will be created"
+
+  SGname:
+    Type: String
+    Description: "Name of the security group"
+
+  SGdesc:
+    Type: String
+    Description: "Description of the security group"
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Ref SGdesc
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: !Ref SGname
+      SecurityGroupIngress:
+        - CidrIp: "192.168.2.0/24"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "197.1.15.0/24"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "10.223.128.0/17"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "204.110.78.0/24"
+          Description: "Dallas Subnet PING"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
+        - CidrIp: "192.168.2.0/24"
+          Description: "Canada ICMP testing"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
+        - CidrIp: "197.1.15.0/24"
+          Description: "Canada ICMP testing"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
+        - CidrIp: "10.8.10.0/24"
+          Description: "Test"
+          FromPort: 0
+          ToPort: 65535
+          IpProtocol: "-1"
+        - CidrIp: "10.224.0.0/15"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "10.255.255.0/24"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "10.224.0.0/15"
+          Description: "Dallas DC - RDP"
+          FromPort: 3389
+          ToPort: 3389
+          IpProtocol: "tcp"
+        - CidrIp: "10.240.0.0/12"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "197.1.14.128/25"
+          Description: "Zebra Printer ports communication from Akron, Dallas, and Canada"
+          FromPort: 9100
+          ToPort: 9100
+          IpProtocol: "tcp"
+        - CidrIp: "10.241.74.20/32"
+          Description: "ServiceNow Discovery Init Port - Eric Retherford 5/18/21"
+          FromPort: 135
+          ToPort: 135
+          IpProtocol: "tcp"
+        - CidrIp: "197.1.14.128/25"
+          Description: "Canada ICMP testing"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
+        - CidrIp: "10.240.0.0/12"
+          Description: "Akron DC - Ping"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
+        - CidrIp: "10.241.74.20/32"
+          Description: "ServiceNow Discovery Range - Eric Retherford 5/18/21"
+          FromPort: 49152
+          ToPort: 65535
+          IpProtocol: "tcp"
+        - CidrIp: "10.240.0.0/12"
+          Description: "EnCase from Akron"
+          FromPort: 4445
+          ToPort: 4445
+          IpProtocol: "tcp"
+        - CidrIp: "10.240.0.0/12"
+          Description: "Akron DC - RDP"
+          FromPort: 3389
+          ToPort: 3389
+          IpProtocol: "tcp"
+        - CidrIp: "10.224.0.0/15"
+          Description: "Dallas DC - Ping"
+          FromPort: -1
+          ToPort: -1
+          IpProtocol: "icmp"
