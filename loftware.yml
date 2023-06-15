@@ -3,15 +3,12 @@ Parameters:
   VpcId:
     Type: String
     Description: "ID of the VPC where the security group will be created"
-
   SGname:
     Type: String
     Description: "Name of the security group"
-
   SGdesc:
     Type: String
     Description: "Description of the security group"
-
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -117,3 +114,6 @@ Resources:
           FromPort: -1
           ToPort: -1
           IpProtocol: "icmp"
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          IpProtocol: "-1"
